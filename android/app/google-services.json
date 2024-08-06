@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "698202999109",
+    "project_id": "car-parking-system-42fc0",
+    "storage_bucket": "car-parking-system-42fc0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:698202999109:android:db1fb1114b0ad8c60f162c",
+        "android_client_info": {
+          "package_name": "com.example.park_place"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD65kXoOn8RW9i6EXRKa-4henzFUoaH36M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
