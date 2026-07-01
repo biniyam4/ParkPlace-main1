@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:park_place/screens/otpScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-bool role=false;
+bool role = false;
+
 class LoginScreen extends StatefulWidget {
   static String? phone;
   final bool isowner;
 
-  LoginScreen({ Key? key, required this.isowner}) : super(key: key);
+  LoginScreen({Key? key, required this.isowner}) : super(key: key);
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -16,31 +17,31 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   final snackBar = SnackBar(
-    content: Text('Please enter valid phone number'),
+    content: Text('Please enter a valid 9-digit Ethiopian phone number'),
     backgroundColor: Colors.red,
     duration: Duration(seconds: 2),
   );
 
   @override
-  void initState(){
+  void initState() {
     fetchRole();
     super.initState();
   }
 
-  void fetchRole() async{
+  void fetchRole() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
-    if(widget.isowner){
+    if (widget.isowner) {
       await pref.setBool('ownerRole', true);
-    }
-    else{
+    } else {
       await pref.setBool('ownerRole', false);
     }
   }
 
   void _signIn() async {
     _formkey.currentState!.validate();
-    if (LoginScreen.phone!.isNotEmpty && LoginScreen.phone!.length == 10) {
-      // Navigator.pushReplacementNamed(context, "/otpScreen");
+    if (LoginScreen.phone != null &&
+        LoginScreen.phone!.isNotEmpty &&
+        LoginScreen.phone!.length == 9) {
       Navigator.push(
         context,
         new MaterialPageRoute(
@@ -59,56 +60,55 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: Colors.grey.withOpacity(.2),
       body: SafeArea(
         child: Scaffold(
-          backgroundColor: widget.isowner? Colors.blue[200]: Colors.purple[300],
+          backgroundColor:
+              widget.isowner ? Colors.blue[200] : Colors.purple[300],
           body: SingleChildScrollView(
-          child:Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: 50,
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Welcome.",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 40,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Container(
-                      child: Text(
-                        "Enter your phone number to continue...",
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 50),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Welcome.",
                         style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 15,
-                          fontWeight: FontWeight.normal,
+                          color: Colors.white,
+                          fontSize: 40,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top:50.0),
-                child: Center(
-                  child: Container(
-                    height: 200,
-                    width: 200,
-                    child: widget.isowner? Image.asset("assets/images/login2.png") : Image.asset("assets/images/login1.png") ,
+                      SizedBox(height: 10),
+                      Container(
+                        child: Text(
+                          "Enter your Ethiopian phone number to continue...",
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 15,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              _formModule(),
-            ],
-          ),
+                Padding(
+                  padding: EdgeInsets.only(top: 50.0),
+                  child: Center(
+                    child: Container(
+                      height: 200,
+                      width: 200,
+                      child: widget.isowner
+                          ? Image.asset("assets/images/login2.png")
+                          : Image.asset("assets/images/login1.png"),
+                    ),
+                  ),
+                ),
+                _formModule(),
+              ],
+            ),
           ),
         ),
       ),
@@ -142,9 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(
-                          height: 20,
-                        ),
+                        SizedBox(height: 20),
                         Container(
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.white12),
@@ -153,49 +151,54 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           padding: EdgeInsets.fromLTRB(20, 5, 15, 5),
                           child: TextFormField(
-                            maxLength: 10,
+                            maxLength: 9,
                             textInputAction: TextInputAction.done,
                             keyboardType: TextInputType.phone,
-                            style: TextStyle(
-                              color: Colors.white,
-                            ),
+                            style: TextStyle(color: Colors.white),
                             decoration: InputDecoration(
                               counterText: "",
-                              prefixText: "+91 ",
+                              prefixText: "+251 ",
+                              prefixStyle: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
                               border: InputBorder.none,
-                              hintText: 'Phone Number',
+                              hintText: '9XXXXXXXX',
                               hintStyle: TextStyle(
                                 color: Colors.white60.withOpacity(.35),
                               ),
                             ),
                             obscureText: false,
                             validator: (val) {
-                              log(val!);
+                              log(val ?? '');
                               setState(() {
                                 LoginScreen.phone = val;
                               });
+                              return null;
                             },
                           ),
                         ),
-
-                        SizedBox(
-                          height: 40,
+                        SizedBox(height: 10),
+                        Text(
+                          "Enter 9 digits after +251\ne.g. 985710523",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white60,
+                            fontSize: 12,
+                          ),
                         ),
-                        //Spacer(),
+                        SizedBox(height: 30),
                       ],
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 35,
-                ),
+                SizedBox(height: 35),
               ],
             ),
             Positioned(
               bottom: 10,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  //shadowColor: Colors.white38,
                   backgroundColor: Colors.white,
                   elevation: 10,
                   padding: EdgeInsets.all(20),
@@ -212,9 +215,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Center(
                     child: Text(
                       "Send OTP",
-                      style: TextStyle(
-                        color: Colors.black,
-                      ),
+                      style: TextStyle(color: Colors.black),
                     ),
                   ),
                 ),

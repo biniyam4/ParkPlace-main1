@@ -34,12 +34,18 @@ const server = http.createServer((req, res) => {
     const ext = path.extname(filePath);
     const contentType = mimeTypes[ext] || 'application/octet-stream';
     const data = fs.readFileSync(filePath);
-    res.writeHead(200, { 'Content-Type': contentType });
+    res.writeHead(200, {
+      'Content-Type': contentType,
+      'Cache-Control': 'no-store, no-cache, must-revalidate',
+    });
     res.end(data);
   } else {
     const indexPath = path.join(BUILD_DIR, 'index.html');
     const data = fs.readFileSync(indexPath);
-    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.writeHead(200, {
+      'Content-Type': 'text/html',
+      'Cache-Control': 'no-store, no-cache, must-revalidate',
+    });
     res.end(data);
   }
 });

@@ -23,11 +23,6 @@ class OTPScreen extends StatefulWidget {
 
 class _OTPScreenState extends State<OTPScreen> {
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
-  final snackBar = SnackBar(
-    content: Text('Invalid OTP! Try again'),
-    backgroundColor: Colors.red,
-    duration: Duration(seconds: 2),
-  );
 
   late String _verificationCode, userCode;
   bool codeSent = false, verifying = false;
@@ -46,101 +41,82 @@ class _OTPScreenState extends State<OTPScreen> {
     owner = (pref.getBool('ownerRole') ?? false);
   }
 
+  String get fullPhone => '+251${widget.phone}';
+
   _phoneVerified() async {
     if (owner) {
       await FirebaseFirestore.instance
           .collection("giveplaceusers")
-          .doc('+91' + widget.phone!)
+          .doc(fullPhone)
           .get()
-          .then(
-        (value) {
-          if (value.exists) {
-            // Navigator.pushReplacementNamed(context,'/ownerHomePage');
-            Navigator.push(
-              context,
-              new MaterialPageRoute(
-                builder: (context) => Home(),
-              ),
-            );
-          } else {
-            FirebaseFirestore.instance
-                .collection("giveplaceusers")
-                .doc(
-                  '+91' + LoginScreen.phone!,
-                )
-                .set(
-              {
-                'fullName': 'Name',
-                'mobileNumber': '+91' + LoginScreen.phone!,
-              },
-            );
-            // Navigator.pushReplacementNamed(context, '/detailsScreen');
-            Navigator.push(
-              context,
-              new MaterialPageRoute(
-                builder: (context) => new DetailsScreen(),
-              ),
-            );
-          }
-        },
-      );
+          .then((value) {
+        if (value.exists) {
+          Navigator.push(
+            context,
+            new MaterialPageRoute(builder: (context) => Home()),
+          );
+        } else {
+          FirebaseFirestore.instance
+              .collection("giveplaceusers")
+              .doc(fullPhone)
+              .set({
+            'fullName': 'Name',
+            'mobileNumber': fullPhone,
+          });
+          Navigator.push(
+            context,
+            new MaterialPageRoute(builder: (context) => new DetailsScreen()),
+          );
+        }
+      });
     } else {
       await FirebaseFirestore.instance
           .collection("parkvehicleusers")
-          .doc('+91' + widget.phone!)
+          .doc(fullPhone)
           .get()
-          .then(
-        (value) {
-          if (value.exists) {
-            // Navigator.pushReplacementNamed(context,'/location_page');
-            Navigator.push(
-              context,
-              new MaterialPageRoute(
-                builder: (context) => HomeUser(),
-              ),
-            );
-          } else {
-            FirebaseFirestore.instance
-                .collection("parkvehicleusers")
-                .doc(
-                  '+91' + LoginScreen.phone!,
-                )
-                .set(
-              {
-                'fullName': 'Name',
-                'mobileNumber': '+91' + LoginScreen.phone!,
-              },
-            );
-            // Navigator.pushReplacementNamed(context, '/parkvehicleDetailPage');
-            Navigator.push(
-              context,
-              new MaterialPageRoute(
-                builder: (context) => ParkDetailsScreen(),
-              ),
-            );
-          }
-        },
-      );
+          .then((value) {
+        if (value.exists) {
+          Navigator.push(
+            context,
+            new MaterialPageRoute(builder: (context) => HomeUser()),
+          );
+        } else {
+          FirebaseFirestore.instance
+              .collection("parkvehicleusers")
+              .doc(fullPhone)
+              .set({
+            'fullName': 'Name',
+            'mobileNumber': fullPhone,
+          });
+          Navigator.push(
+            context,
+            new MaterialPageRoute(builder: (context) => ParkDetailsScreen()),
+          );
+        }
+      });
     }
   }
 
   _verifyPhone(phone) async {
     await FirebaseAuth.instance.verifyPhoneNumber(
-      phoneNumber: '+91$phone',
+      phoneNumber: '+251$phone',
       verificationCompleted: (PhoneAuthCredential credential) async {
         await FirebaseAuth.instance
             .signInWithCredential(credential)
             .then((value) async {
           if (value.user != null) {
-            log('# Created #');
+            log('# Auto-verified #');
             _phoneVerified();
           }
         });
       },
       verificationFailed: (FirebaseAuthException e) {
-        log(e.message!);
-        showSnackBar('Something went wrong !', Colors.red);
-        Navigator.pushReplacementNamed(context, '/loginScreen');
+        log('Verification failed: ${e.message}');
+        showSnackBar(
+            'Verification failed: ${e.message ?? "Unknown error"}', Colors.red);
+        setState(() {
+          codeSent = false;
+        });
       },
       codeSent: (String? verficationID, int? resendToken) {
         setState(() {
@@ -149,8 +125,7 @@ class _OTPScreenState extends State<OTPScreen> {
         });
       },
       codeAutoRetrievalTimeout: (String verificationID) {
-        showSnackBar('OTP verification timed out !', Colors.red);
-        Navigator.pushReplacementNamed(context, '/loginScreen');
+        log('OTP timeout');
       },
       timeout: Duration(seconds: 60),
     );
@@ -177,7 +152,7 @@ class _OTPScreenState extends State<OTPScreen> {
         });
       }
     } else {
-      showSnackBar('Invalid OTP! Try again', Colors.red);
+      showSnackBar('Please enter the 6-digit OTP', Colors.red);
       setState(() {
         verifying = false;
       });
@@ -189,19 +164,18 @@ class _OTPScreenState extends State<OTPScreen> {
     super.initState();
     checkRole();
     _verifyPhone(widget.phone);
-    log(widget.phone!);
+    log('Verifying phone: +251${widget.phone}');
   }
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
-        showSnackBar('You cannot go back at this stage ', Colors.grey[600]!);
-        return Future.value(false);
+        return Future.value(true);
       },
       child: Scaffold(
         resizeToAvoidBottomInset: false,
-        backgroundColor: owner? Colors.blue[200] : Colors.purple[300],
+        backgroundColor: owner ? Colors.blue[200] : Colors.purple[300],
         body: SafeArea(
           child: Container(
             decoration: BoxDecoration(
@@ -209,17 +183,29 @@ class _OTPScreenState extends State<OTPScreen> {
             ),
             child: !codeSent
                 ? Center(
-                    child: SpinKitFadingCircle(
-                      color: Colors.white60,
-                      size: 30,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SpinKitFadingCircle(
+                          color: Colors.white60,
+                          size: 30,
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          'Sending OTP to\n+251 ${widget.phone}',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
                     ),
                   )
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(
-                        height: 50,
-                      ),
+                      SizedBox(height: 50),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
                         child: Column(
@@ -233,17 +219,13 @@ class _OTPScreenState extends State<OTPScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Container(
-                              child: Text(
-                                "Enter the OTP sent to  +91 ${widget.phone}  to continue...",
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.normal,
-                                ),
+                            SizedBox(height: 10),
+                            Text(
+                              "Enter the OTP sent to  +251 ${widget.phone}  to continue...",
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 15,
+                                fontWeight: FontWeight.normal,
                               ),
                             ),
                           ],
@@ -285,9 +267,7 @@ class _OTPScreenState extends State<OTPScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(
-                          height: 20,
-                        ),
+                        SizedBox(height: 20),
                         Container(
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.white12),
@@ -298,45 +278,43 @@ class _OTPScreenState extends State<OTPScreen> {
                           child: TextFormField(
                             maxLength: 6,
                             textInputAction: TextInputAction.done,
-                            keyboardType: TextInputType.phone,
+                            keyboardType: TextInputType.number,
                             style: TextStyle(
                               color: Colors.white,
+                              letterSpacing: 8,
+                              fontSize: 20,
                             ),
                             decoration: InputDecoration(
                               counterText: "",
                               border: InputBorder.none,
-                              hintText: 'Enter OTP',
+                              hintText: '------',
                               hintStyle: TextStyle(
                                 color: Colors.white60.withOpacity(.35),
+                                letterSpacing: 8,
                               ),
                             ),
                             obscureText: false,
                             validator: (val) {
                               setState(() {
-                                userCode = val!;
+                                userCode = val ?? '';
                               });
+                              return null;
                             },
                           ),
                         ),
-                        SizedBox(
-                          height: 40,
-                        ),
+                        SizedBox(height: 40),
                       ],
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 35,
-                ),
+                SizedBox(height: 35),
               ],
             ),
             Positioned(
               bottom: 10,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  //shadowColor: Colors.white38,
                   backgroundColor: Colors.white,
-
                   elevation: 10,
                   padding: EdgeInsets.all(20),
                   shape: RoundedRectangleBorder(
@@ -363,9 +341,7 @@ class _OTPScreenState extends State<OTPScreen> {
                           )
                         : Text(
                             "Log in",
-                            style: TextStyle(
-                              color: Colors.black,
-                            ),
+                            style: TextStyle(color: Colors.black),
                           ),
                   ),
                 ),

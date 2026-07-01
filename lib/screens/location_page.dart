@@ -376,7 +376,7 @@ class _PrefetchImageDemoState extends State<PrefetchImageDemo> {
                               Row(
                                 children: [
                                   Text(
-                                    '+91 ',
+                                    '+251 ',
                                     style: TextStyle(fontSize: 18),
                                   ),
                                   Text(
