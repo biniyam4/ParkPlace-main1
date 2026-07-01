@@ -404,7 +404,7 @@ class _PrefetchImageDemoState extends State<PrefetchImageDemo> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                             elevation: 5,
-                            primary: Colors.redAccent,
+                            backgroundColor: Colors.redAccent,
                           ),
                           child: Text(
                             'Pay And Park',

@@ -335,7 +335,7 @@ class _OTPScreenState extends State<OTPScreen> {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   //shadowColor: Colors.white38,
-                  primary: Colors.white,
+                  backgroundColor: Colors.white,
 
                   elevation: 10,
                   padding: EdgeInsets.all(20),

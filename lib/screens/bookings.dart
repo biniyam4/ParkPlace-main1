@@ -438,7 +438,7 @@ class _BookingsState extends State<Bookings> {
                                     updateplace();
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    primary: Colors.green[600],
+                                    backgroundColor: Colors.green[600],
                                   ),
                                 )),
                           ],

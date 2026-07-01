@@ -157,7 +157,7 @@ class _DashbordState extends State<Dashbord> {
                 padding: EdgeInsets.fromLTRB(30.0, 10.0, 30.0, 0.0),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.blue
+                    backgroundColor: Colors.blue
                   ),
                     child: Text("Add Place"),
                     onPressed: () {
@@ -408,7 +408,7 @@ class _DashbordState extends State<Dashbord> {
                                         child: Text('Submit'),
                                         onPressed: addplace,
                                         style: ElevatedButton.styleFrom(
-                                          primary: Colors.green[600],
+                                          backgroundColor: Colors.green[600],
                                         ),
                                       )),
                                 ],

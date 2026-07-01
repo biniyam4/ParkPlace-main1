@@ -196,7 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   //shadowColor: Colors.white38,
-                  primary: Colors.white,
+                  backgroundColor: Colors.white,
                   elevation: 10,
                   padding: EdgeInsets.all(20),
                   shape: RoundedRectangleBorder(
